@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import * as Location from "expo-location";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
@@ -10,20 +9,81 @@ import {
   Dimensions,
   ActivityIndicator,
 } from "react-native";
-import { MaterialIcons, Ionicons, FontAwesome } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-
 const apikey_json = require("./apikey.json");
-
-const API_KEY = apikey_json.ApiKey
+const API_KEY = apikey_json.ApiKey;
 
 export default function App() {
   const [street, setStreet] = useState("Loading...");
   const [district, setDistrict] = useState("Loading...");
   const [ok, setOk] = useState(true);
   const [days, setDays] = useState([]);
-  
+
+  const weatherItem = {
+    Clouds: {
+      icon: "cloud",
+      title: "구름",
+      color: "#1F1C2C",
+      subtitle: "구름이 많아요",
+    },
+    Clear: {
+      icon: "sun",
+      title: "맑음",
+      color: "#F7B733",
+      subtitle: "맑은 하늘",
+    },
+    Rain: {
+      icon: "cloud-rain",
+      title: "비",
+      color: "#005BEA",
+      subtitle: "비가 오고 있어요",
+    },
+    Snow: {
+      icon: "snowflake",
+      title: "눈",
+      color: "#00d2ff",
+      subtitle: "눈이 오고 있어요",
+    },
+    Drizzle: {
+      icon: "cloud-rain",
+      title: "이슬비",
+      color: "#076585",
+      subtitle: "이슬비가 오고 있어요",
+    },
+    Thunderstorm: {
+      icon: "poo-storm",
+      title: "천둥번개",
+      color: "#616161",
+      subtitle: "천둥번개가 치고 있어요",
+    },
+    Atmosphere: {
+      icon: "smog",
+      title: "안개",
+      color: "#616161",
+      subtitle: "안개가 껴있어요",
+    },
+    Haze: {
+      icon: "smog",
+      title: "안개",
+      color: "#616161",
+      subtitle: "안개가 껴있어요",
+    },
+    Mist: {
+      icon: "smog",
+      title: "안개",
+      color: "#616161",
+      subtitle: "안개가 껴있어요",
+    },
+    Dust: {
+      icon: "smog",
+      title: "먼지",
+      color: "#616161",
+      subtitle: "먼지가 많아요",
+    },
+  };
+
   const ask = async () => {
     const { granted } = await Location.requestForegroundPermissionsAsync();
     granted ? setOk(true) : setOk(false);
@@ -36,9 +96,6 @@ export default function App() {
     });
     setDistrict(location[0].district);
     setStreet(location[0].street);
-    // const response = await fetch(`https://api.openweathermap.org/data/3.0/onecall?lat=${latitude}&lon=${longitude}&exclude=alerts&appid=${API_KEY}`);
-    // const json = await response.json();
-    // // setDays(json.daily);
     axios
       .get(
         `https://api.openweathermap.org/data/3.0/onecall?lat=${latitude}&lon=${longitude}&exclude=alerts&appid=${API_KEY}&units=metric`
@@ -77,44 +134,22 @@ export default function App() {
               <Text style={styles.date}>
                 {new Date(day.dt * 1000).toLocaleDateString()}
               </Text>
-
               <Text style={styles.temp}>{parseInt(day.temp.day)}°</Text>
               <Text style={styles.desc}>
-                {day.weather[0].main === "Clear" ? (
-                  <MaterialIcons name="wb-sunny" size={70} color="red" />
-                ) : day.weather[0].main === "Clouds" ? (
-                  <MaterialIcons name="cloud" size={70} color="gray" />
-                ) : day.weather[0].main === "Rain" ? (
-                  // ? "🌧"
-                  <Ionicons name="ios-rainy-sharp" size={70} color="black" />
-                ) : day.weather[0].main === "Snow" ? (
-                  <FontAwesome name="snowflake-o" size={70} color="white" />
-                ) : day.weather[0].main === "Drizzle" ? (
-                  "이슬비"
-                ) : day.weather[0].main === "Thunderstorm" ? (
-                  "천둥번개"
-                ) : day.weather[0].main === "Mist" ? (
-                  "안개"
-                ) : day.weather[0].main === "Smoke" ? (
-                  "연기"
-                ) : day.weather[0].main === "Haze" ? (
-                  "안개"
-                ) : day.weather[0].main === "Dust" ? (
-                  "먼지"
-                ) : day.weather[0].main === "Fog" ? (
-                  "안개"
-                ) : day.weather[0].main === "Sand" ? (
-                  "모래"
-                ) : day.weather[0].main === "Ash" ? (
-                  "재"
-                ) : day.weather[0].main === "Squall" ? (
-                  "돌풍"
-                ) : day.weather[0].main === "Tornado" ? (
-                  "토네이도"
-                ) : (
-                  "알수없음"
-                )}
+                <View style={styles.weatherMain}>
+                  <Text style={styles.weatherMainTitle}>
+                    {weatherItem[day.weather[0].main].title}
+                  </Text>
+                </View>
+                <View>
+                  <FontAwesome5
+                    name={weatherItem[day.weather[0].main].icon}
+                    size={50}
+                    color="black"
+                  />
+                </View>
               </Text>
+              <Text>{weatherItem[day.weather[0].main].subtitle}</Text>
             </View>
           ))
         )}
@@ -161,6 +196,13 @@ const styles = StyleSheet.create({
   },
   date: {
     fontSize: 25,
+    fontWeight: "500",
+  },
+  weatherMain: {
+    // flex: 1,
+  },
+  weatherMainTitle: {
+    fontSize: 50,
     fontWeight: "500",
   },
 });
